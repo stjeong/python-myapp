@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'bbs/custom.css' %}" />
+    <title>{% block title %}Django Framework{% endblock %}</title>
+</head>
+<body>
+    <nav class="menu">
+        {% block menu %}
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/bbs">bbs</a></li>
+        </ul>
+        {% endblock %}
+    </nav>
+
+    <div class="contents">{% block contents %} {% endblock %}</div>
+
+    <footer>
+        {% block footer %}This is footer{% endblock %}
+    </footer>
+</body>
+</html>
