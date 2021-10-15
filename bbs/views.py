@@ -1,4 +1,6 @@
 # Create your views here.
+import os
+import time
 
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
@@ -13,6 +15,11 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
+
+        print(os.getpid(), "myapp.views.py: " + os.getcwd())
+        if os.getenv("PYTHONPATH"):
+            print(os.getpid(), "myapp:", os.getenv("PYTHONPATH"))
+
         return Question.objects.order_by('-pub_date')[:5]
 
 
@@ -61,9 +68,11 @@ def results(request, question_id):
 
 
 def parent(request):
+    time.sleep(5)
     return render(request, 'bbs/base.html')
 
 
 def child(request):
+    time.sleep(60)
     return render(request, 'bbs/child.html')
 

@@ -8,9 +8,12 @@ https://docs.djangoproject.com/en/3.2/howto/deployment/wsgi/
 """
 
 import os
+import pydevd
 
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myapp.settings')
 
 application = get_wsgi_application()
+
+# pydevd.settrace('172.23.208.1', port=15555, stdoutToServer=True, stderrToServer=True)
