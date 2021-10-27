@@ -10,6 +10,17 @@ from django.views import generic
 from .models import Question, Choice
 
 
+def get_wsl_ip():
+    try:
+        with open('/etc/resolv.conf') as f:
+            for line in f.readlines():
+                item = line.split(' ')
+                if item[0] == 'nameserver':
+                    return item[1].strip()
+    except FileNotFoundError:
+        pass
+
+
 class IndexView(generic.ListView):
     template_name = 'bbs/index.html'
     context_object_name = 'latest_question_list'
@@ -75,4 +86,161 @@ def parent(request):
 def child(request):
     time.sleep(60)
     return render(request, 'bbs/child.html')
+
+
+def sqlite3test(request):
+    import sqlite3
+
+    con = sqlite3.connect('./my_test.db')
+    cursor = con.cursor()
+
+    query = "CREATE TABLE IF NOT EXISTS member(ID int primary key not null, Name text, Age int);"
+    cursor.execute(query)
+
+    query = "DELETE FROM member"
+    cursor.execute(query)
+
+    for idx in range(1, 5):
+        query = "INSERT OR REPLACE INTO member VALUES({0}, 'tester{1}', {2})".format(idx, idx, idx * 10)
+        cursor.execute(query)
+
+    con.commit()
+
+    query = "SELECT * FROM member"
+    cursor.execute(query)
+    query_result = str(cursor.fetchall())
+    con.close()
+
+    return render(request, 'bbs/sqlite3test.html', {'result_set': query_result})
+
+
+def mysqlclient_raw(request):
+    from MySQLdb import _mysql
+
+    mysql_ip = get_wsl_ip()
+    if mysql_ip is None:
+        mysql_ip = "127.0.0.1"
+
+    con = _mysql.connect(mysql_ip, "testusr", "testusr@100420", "test")
+    # con = _mysql.connect(host="localhost", user="testusr", passwd="testusr@100420", db="test", charset='utf8mb4')
+
+    con.query("INSERT INTO test(name, age, enable) VALUES('테스터', 23, 1)")
+
+    con.query("SELECT * FROM test;")
+
+    r = con.store_result()
+    record_text = ""
+
+    while True:
+        record = r.fetch_row()
+        # record = r.fetchone()
+        if not record:
+            break
+
+        name_value = record[0]
+        record_text += str(name_value) + "\n"
+        print(record)
+
+    con.query("DELETE FROM test WHERE enable=1 AND age=23")
+
+    con.close()
+
+    return render(request, 'bbs/mysqlclient_raw.html', {'result_set': record_text})
+
+
+def mysqlclient_wrapper(request):
+    import MySQLdb
+
+    mysql_ip = get_wsl_ip()
+    if mysql_ip is None:
+        mysql_ip = "127.0.0.1"
+
+    con = MySQLdb.connect(mysql_ip, "testusr", "testusr@100420", "test", charset='utf8')
+    con.encoding = 'utf8'
+
+    # cursor = con.cursor(dictionary=True)
+    # cursor = con.cursor()
+    cursor = con.cursor(MySQLdb.cursors.DictCursor)
+
+    query = "DELETE FROM test"
+    cursor.execute(query)
+
+    for idx in range(1, 5):
+        query = "INSERT INTO test(name, age, enable) VALUES('테스터{0}', {1}, {2});".format(idx, idx, idx * 10)
+        cursor.execute(query)
+
+    con.commit()
+
+    query = "SELECT * FROM test"
+    cursor.execute(query)
+
+    record_text = ""
+
+    all_rows = cursor.fetchall()
+    for row in all_rows:
+        record_text += str(row)
+        # field_name = row[0]
+        # field_age = row[1]
+        # field_enable = row[2]
+
+        # field_name = row['name']
+        field_age = row['age']
+        field_enable = row['enable']
+
+    # while True:
+    #     record = cursor.fetchone()
+    #     if not record:
+    #         break
+    #
+    #     record_text += str(record)
+
+    cursor.close()
+
+    return render(request, 'bbs/mysqlclient_wrapper.html', {'result_set': record_text})
+
+
+def pymysqltest(request):
+    import pymysql
+
+    mysql_ip = get_wsl_ip()
+    if mysql_ip is None:
+        mysql_ip = "127.0.0.1"
+
+    con = pymysql.connect(host=mysql_ip, user="testusr", password="testusr@100420", db="test", charset='utf8')
+
+    # cursor = con.cursor(dictionary=True)
+    # cursor = con.cursor()
+    cursor = con.cursor(pymysql.cursors.DictCursor)
+
+    query = "DELETE FROM test"
+    cursor.execute(query)
+
+    for idx in range(1, 5):
+        query = "INSERT INTO test(name, age, enable) VALUES('테스터{0}', {1}, {2});".format(idx, idx, idx * 10)
+        cursor.execute(query)
+
+    con.commit()
+
+    query = "SELECT * FROM test"
+    cursor.execute(query)
+
+    record_text = ""
+
+    all_rows = cursor.fetchall()
+    for row in all_rows:
+        record_text += str(row)
+        field_name = row['name']
+        field_age = row['age']
+        field_enable = row['enable']
+
+    # while True:
+    #     record = cursor.fetchone()
+    #     if not record:
+    #         break
+    #
+    #     record_text += str(record)
+
+    cursor.close()
+
+    return render(request, 'bbs/pymysqltest.html', {'result_set': record_text})
 

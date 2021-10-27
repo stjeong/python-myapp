@@ -24,6 +24,10 @@ urlpatterns = [
 
     path('parent', views.parent, name='parent'),
     path('child', views.child, name='child'),
+    path('sqlite3test', views.sqlite3test, name='sqlite3test'),
+    path('mysqlclient_raw', views.mysqlclient_raw, name='mysqlclient_raw'),
+    path('mysqlclient_wrapper', views.mysqlclient_wrapper, name='mysqlclient_wrapper'),
+    path('pymysqltest', views.pymysqltest, name='pymysqltest'),
 
     url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
     url(r'^(?P<pk>\d+)/results/$', views.ResultsView.as_view(), name='results'),
