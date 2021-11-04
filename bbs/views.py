@@ -244,3 +244,17 @@ def pymysqltest(request):
 
     return render(request, 'bbs/pymysqltest.html', {'result_set': record_text})
 
+
+def urlreqtest(request):
+    import requests
+    r = requests.get("https://www.naver.com")
+
+    return render(request, 'bbs/urlreqtest.html', {'result_set': r.status_code})
+
+
+def urllibtest(request):
+    import urllib.request
+    with urllib.request.urlopen('https://www.naver.com/') as response:
+        html = response.read()
+
+    return render(request, 'bbs/urllibtest.html', {'result_set': html})

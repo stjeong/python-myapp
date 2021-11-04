@@ -28,6 +28,8 @@ urlpatterns = [
     path('mysqlclient_raw', views.mysqlclient_raw, name='mysqlclient_raw'),
     path('mysqlclient_wrapper', views.mysqlclient_wrapper, name='mysqlclient_wrapper'),
     path('pymysqltest', views.pymysqltest, name='pymysqltest'),
+    path('urlreqtest', views.urlreqtest, name='urlreqtest'),
+    path('urllibtest', views.urllibtest, name='urllibtest'),
 
     url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
     url(r'^(?P<pk>\d+)/results/$', views.ResultsView.as_view(), name='results'),
